@@ -1,10 +1,22 @@
 from fastapi import FastAPI, Request
 import requests
 from fastapi.responses import JSONResponse
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 TARGET_URL = "http://10.2.42.10:8088/lsystem"
+
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    #allow_origins=["http://localhost:4000"],  # Allow requests from Next.js frontend
+    allow_origins=["*"],  # Allow requests from any origin
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 @app.post("/forward")
 async def forward_post(request: Request):
