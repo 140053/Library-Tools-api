@@ -2,7 +2,9 @@ from fastapi import FastAPI, Request
 import requests
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
 app = FastAPI()
+from db import Database
 
 TARGET_URL = "http://10.2.42.10:8088/lsystem"
 
@@ -52,3 +54,20 @@ async def forward_post(request: Request):
 
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
+
+
+
+@app.get("/books")
+async def get_books():
+    try:
+        conn = Database.connect()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM books")
+        books = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return JSONResponse(content={"books": jsonable_encoder(books)})
+
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
